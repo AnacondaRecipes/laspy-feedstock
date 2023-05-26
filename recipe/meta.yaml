@@ -12,13 +12,12 @@ source:
 build:
   number: 0
   # maturin isn't available on s390x
-  skip: true  # [py<39 or s390x]
+  skip: true  # [py<37 or s390x]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   host:
     - python
-    - lazrs-python 0.5.0
     - numpy {{ numpy }}
     - pip
     - setuptools
@@ -26,6 +25,7 @@ requirements:
   run:
     - python
     - {{ pin_compatible('numpy') }}
+    # to enable LAZ backend https://github.com/laspy/laspy#features
     - lazrs-python >=0.5.0,<0.6.0
 
 test:
