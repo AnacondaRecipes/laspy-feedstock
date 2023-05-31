@@ -11,32 +11,33 @@ source:
 
 build:
   number: 0
-  skip: true  # [py<39]
-  script: {{ PYTHON }} -m pip install . -vv
+  # maturin isn't available on s390x
+  skip: true  # [py<37 or s390x]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
-  build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - numpy                                  # [build_platform != target_platform]
   host:
     - python
+    - numpy {{ numpy }}
     - pip
-    - numpy
-    - lazrs-python
+    - setuptools
+    - wheel
   run:
     - python
-    - numpy
-    - lazrs-python
+    - {{ pin_compatible('numpy') }}
+    # to enable LAZ backend https://github.com/laspy/laspy#features
+    - lazrs-python >=0.5.0,<0.6.0
 
 test:
   imports:
     - laspy
   requires:
+    - pip
     - pytest
   source_files:
     - tests/*
   commands:
+    - pip check
     - pytest -v
 
 about:
@@ -45,7 +46,6 @@ about:
   license_family: BSD
   license_file: LICENSE.txt
   summary: Native Python ASPRS LAS read/write library
-
   description: |
     Laspy is a python library for reading, modifying and creating LAS LiDAR files.
   doc_url: https://laspy.readthedocs.io/en/latest/
